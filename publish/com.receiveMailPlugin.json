@@ -1,0 +1,17 @@
+{
+	"manifest_version": 1,
+	"id": "com.receiveMailPlugin",
+	"app_min_version": "2.13",
+	"version": "1.0.0",
+	"name": "MailPlugin",
+	"description": "Define a Mail adress and send mails to it, to add new notebooks",
+	"author": "MrHipppo",
+	"homepage_url": "",
+	"repository_url": "",
+	"keywords": [],
+	"categories": [],
+	"screenshots": [],
+	"icons": {},
+	"_publish_hash": "sha256:3497d3587b3cf12c45e6d28126eef54a7a7d9a9c3a80ec0df1d397747a36da05",
+	"_publish_commit": ""
+}
