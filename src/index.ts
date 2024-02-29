@@ -76,11 +76,6 @@ const registerSettings = async () => {
     });
 };
 
-
-
-
-
-
 // Register the plugin
 joplin.plugins.register({
 
@@ -94,7 +89,6 @@ joplin.plugins.register({
             const SetimapServer = await joplin.settings.value(imapServer);
             const SetTLS = await joplin.settings.value(MailTLS);
             const SetstringSubject = await joplin.settings.value(stringSubject);
-
             const imapConfig = {
                 user: SetMailAddress,
                 password: SetMailPassword,
@@ -102,32 +96,37 @@ joplin.plugins.register({
                 port: SetMailPort,
                 tls: SetTLS,
             };
-         //Test Note creation
-            //let newNotebook = await joplin.data.post(['folders'], null, { title: "resr", parent_id: ""});
-            //let newnote = await joplin.data.post(['notes'], null, {body: "# body", title: "title", parent_id: newNotebook.id });
-        //get the Notebookname from the settings
-        const settingValue = await joplin.settings.value(StandardNotebookId);
-        //get all notebooks
-        let notebook = await joplin.data.get(['folders']);
-        var notebookID = "";
+            //get the Notebookname from the settings
+            const settingValue = await joplin.settings.value(StandardNotebookId);
+            //get all notebooks
+            let notebook = await joplin.data.get(['folders']);
+            var notebookID = "";
 
-        //parse through notebooks and get the id of the necessary notebook
-            notebook.items.forEach(function(book){
-                //console.info(book.title);
-                if(book.title == settingValue)
-                notebookID = book.id;
-            });
-            getEmails(notebookID, imapConfig, SetstringSubject);
-        //create new note in said notebook
+            //parse through notebooks and get the id of the necessary notebook
+            if(settingValue != "")
+            {
+                notebook.items.forEach(function(book){
+                    if(book.title == settingValue)
+                    {
+                        notebookID = book.id;
+                    }
 
+                });
 
+                if(SetMailAddress != "" &&SetMailPassword != "" &&SetMailPort != "" &&SetimapServer != "" &&SetstringSubject != "" &&SetTLS != "")
+                {
+                    getEmails(notebookID, imapConfig, SetstringSubject);
+                }
+                else {
+                    let newnote = await joplin.data.post(['notes'], null, {body: "One or more of the Fields of the Setup are empty", title: "EROOR!", parent_id: notebookID });
+                }
+            }
+            else{
+                let newnote = await joplin.data.post(['notes'], null, {body: "Notebook is missing in the Settings", title: "EROOR!", parent_id: notebookID });
+            }
      },
 
  });
-
-
-
-
 
 // From https://stackoverflow.com/a/6234804/561309
 function escapeHtml(unsafe:string) {
@@ -152,11 +151,10 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
             msg.on('body', stream => {
               simpleParser(stream, async (err, parsed) => {
                 // const {from, subject, textAsHtml, text} = parsed;
-                console.log(neededSubject);
-                console.log(parsed.subject);
                 if(parsed.subject.includes(neededSubject))
                 {
                     const subj = parsed.subject.replace(neededSubject, "");
+                    //write into notebook
                     let newnote = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(subj), parent_id: notebookID });
                 }
                 /* Make API call to save the data
@@ -169,15 +167,14 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
               const {uid} = attrs;
               imap.addFlags(uid, ['\\Seen'], () => {
                 // Mark the email as read after reading it
-           //     console.log('Marked as read!');
               });
             });
           });
           f.once('error', ex => {
+           let newnote = joplin.data.post(['notes'], null, {body: ex, title: "Error", parent_id: notebookID });
             return Promise.reject(ex);
           });
           f.once('end', () => {
-            console.log('Done fetching all messages!');
             imap.end();
           });
         });
@@ -185,15 +182,14 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
     });
 
     imap.once('error', err => {
-      console.log(err);
+    let newnote = joplin.data.post(['notes'], null, {body: err, title: "Error", parent_id: notebookID });
     });
 
     imap.once('end', () => {
-      console.log('Connection ended');
     });
 
     imap.connect();
   } catch (ex) {
-    console.log('an error occurred');
+  let newnote = joplin.data.post(['notes'], null, {body: "an error occurred", title: "Error", parent_id: notebookID });
   }
 };
