@@ -110,10 +110,9 @@ joplin.plugins.register({
                     {
                         notebookID = book.id;
                     }
-
                 });
 
-                if(SetMailAddress != "" &&SetMailPassword != "" &&SetMailPort != "" &&SetimapServer != "" &&SetstringSubject != "" &&SetTLS != "")
+                if(SetMailAddress != "" &&SetMailPassword != "" &&SetMailPort != "" &&SetimapServer != ""&&SetstringSubject != "")
                 {
                     getEmails(notebookID, imapConfig, SetstringSubject);
                 }
@@ -145,18 +144,25 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
     const imap = new Imap(imapConfig1);
     imap.once('ready', () => {
       imap.openBox('INBOX', false, () => {
-        imap.search(['UNSEEN', ['SINCE', new Date()]], (err, results) => {
+        imap.search(['UNSEEN'], (err, results) => {
           const f = imap.fetch(results, {bodies: ''});
           f.on('message', msg => {
             msg.on('body', stream => {
               simpleParser(stream, async (err, parsed) => {
                 // const {from, subject, textAsHtml, text} = parsed;
-                if(parsed.subject.includes(neededSubject))
+                if(neededSubject!="[empty]")
                 {
-                    const subj = parsed.subject.replace(neededSubject, "");
-                    //write into notebook
-                    let newnote = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(subj), parent_id: notebookID });
+                    if(parsed.subject.includes(neededSubject))
+                    {
+                        const subj = parsed.subject.replace(neededSubject, "");
+                        //write into notebook
+                        let newnote = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(subj), parent_id: notebookID });
+                    }
                 }
+                else{
+                    let newnote1 = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(parsed.subject), parent_id: notebookID });
+                }
+
                 /* Make API call to save the data
                    Save the retrieved data into a database.
                    E.t.c
