@@ -1,3 +1,5 @@
 .idea/
 
 publish/
+dist/
+node_modules/

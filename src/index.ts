@@ -177,7 +177,8 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
             });
           });
           f.once('error', ex => {
-           let newnote = joplin.data.post(['notes'], null, {body: ex, title: "Error", parent_id: notebookID });
+          let dateTime = new Date();
+           let newnote = joplin.data.post(['notes'], null, {body: ex, title: "Error"+dateTime , parent_id: notebookID });
             return Promise.reject(ex);
           });
           f.once('end', () => {
@@ -188,7 +189,8 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
     });
 
     imap.once('error', err => {
-    let newnote = joplin.data.post(['notes'], null, {body: err, title: "Error", parent_id: notebookID });
+    let dateTime = new Date();
+    let newnote = joplin.data.post(['notes'], null, {body: err, title: "Error"+ dateTime, parent_id: notebookID });
     });
 
     imap.once('end', () => {
@@ -196,6 +198,7 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
 
     imap.connect();
   } catch (ex) {
-  let newnote = joplin.data.post(['notes'], null, {body: "an error occurred", title: "Error", parent_id: notebookID });
+  let dateTime = new Date();
+  let newnote = joplin.data.post(['notes'], null, {body: "an error occurred", title: "Error"+dateTime, parent_id: notebookID });
   }
 };
