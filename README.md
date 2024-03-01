@@ -21,6 +21,7 @@ Get all the E-Mails, that get sent to a specific E-Mail Address made into Notes.
 I have no Idea, how safe your data is saved within the Joplin Databases, so I would suggest creating a E-Mail Address just for this purpose (for example on gmail) and delete the E-Mails periodically, so that if the password gets leaked, its not that big of a deal.
 ## Known Issues
 - The Mail Parser doesn't find the text of some mails
+  - Fixed
 ## Planned for coming releases
 - [x] Add Date and Time to Error Messages
 - [ ] Also Add E-Mail Attachments to Notes

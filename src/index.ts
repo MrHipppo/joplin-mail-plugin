@@ -150,17 +150,29 @@ const getEmails = (notebookID, imapConfig1, neededSubject) => {
             msg.on('body', stream => {
               simpleParser(stream, async (err, parsed) => {
                 // const {from, subject, textAsHtml, text} = parsed;
+                console.info(parsed);
                 if(neededSubject!="[empty]")
                 {
                     if(parsed.subject.includes(neededSubject))
                     {
                         const subj = parsed.subject.replace(neededSubject, "");
                         //write into notebook
-                        let newnote = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(subj), parent_id: notebookID });
+                        if(parsed.text)
+                        {
+                            let newnote = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(subj), parent_id: notebookID });
+                        }else{
+                            let newnote = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.html), title: escapeHtml(subj), parent_id: notebookID });
+                        }
+
                     }
                 }
                 else{
-                    let newnote1 = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(parsed.subject), parent_id: notebookID });
+                    if(parsed.text)
+                    {
+                        let newnote1 = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.text), title: escapeHtml(parsed.subject), parent_id: notebookID });
+                    }else{
+                        let newnote1 = await joplin.data.post(['notes'], null, {body: escapeHtml(parsed.html), title: escapeHtml(parsed.subject), parent_id: notebookID });
+                    }
                 }
 
                 /* Make API call to save the data
